@@ -1,0 +1,34 @@
+# Firebase
+.firebase/
+firebase-debug.log
+ui-debug.log
+.runtimeconfig.json
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Build and distribution
+dist/
+build/
+*.log
+
+# Service account keys
+*-service-account.json
+serviceAccountKey.json 
