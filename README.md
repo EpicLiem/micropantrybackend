@@ -1,4 +1,4 @@
-# MicroPantry Backend (readme generated with chat so may have hallucinations)
+# MicroPantry Backend
 
 Firebase Functions backend for the MicroPantry grocery management application.
 
@@ -14,6 +14,15 @@ Firebase Functions backend for the MicroPantry grocery management application.
 - Barcode scanning for product information
 - Food item recognition
 - Micronutrition analysis
+
+## API Documentation
+
+You can view the complete API documentation in an interactive format using Swagger UI:
+[View API Documentation](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/EpicLiem/micropantrybackend/refs/heads/main/backend/openapi.yaml#/)
+
+## Authentication
+
+This API uses Firebase Authentication. All endpoints require a valid Firebase ID token to be included in the Authorization header as a Bearer token.
 
 ## API Endpoints
 
@@ -55,6 +64,9 @@ Firebase Functions backend for the MicroPantry grocery management application.
 ### Receipt Recognition
 - `POST /receipt/process` - Process receipt image
 
+### Food Item Recognition
+- `POST /food/recognize` - Recognize food items in an image
+
 ### Barcode Recognition
 - `POST /barcode/process` - Process barcode
 
@@ -69,22 +81,21 @@ Firebase Functions backend for the MicroPantry grocery management application.
 
 1. Install dependencies:
    ```
-   cd functions
    npm install
    ```
 
 2. Set up environment variables:
-   - Create a `.env` file in the functions directory
+   - Create a `.env` file in the root directory
    - Add required API keys (Edamam, OpenAI)
 
 3. Local development:
    ```
-   firebase emulators:start
+   npm run serve
    ```
 
 4. Deploy to Firebase:
    ```
-   firebase deploy --only functions
+   npm run deploy
    ```
 
 ## Requirements
