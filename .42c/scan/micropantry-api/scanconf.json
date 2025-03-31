@@ -1,0 +1,534 @@
+{
+    "version": "2.0.0",
+    "runtimeConfiguration": {
+        "environment": "default",
+        "laxTestingModeEnabled": false,
+        "apiConnectivityCheck": true,
+        "logLevel": "error",
+        "logDestination": "stdout+platform",
+        "logMaxFileSize": 2147483648,
+        "requestHeaderNameRequestId": "x-scan-request-id",
+        "requestHeaderNameScenarioId": "x-scan-scenario-id",
+        "requestHeaderNameRequestType": "x-scan-request-type",
+        "requestFlowrate": 100,
+        "requestTimeout": 30,
+        "requestTlsInsecureSkipVerify": true,
+        "responseFollowRedirection": false,
+        "responseMaxBodySizeScan": 10485760,
+        "happyPathOnly": false,
+        "maxRequestRetryAttempts": 5,
+        "maxScanDuration": 1800,
+        "memoryLimit": 2147483648,
+        "memoryTimeSpan": 10,
+        "reportMaxRequestSizeHappyPath": 8092,
+        "reportMaxRequestSizeTest": 8092,
+        "reportIncludeRequestBody": true,
+        "reportIncludeResponseBody": true,
+        "reportMaxHttpResponseSizeHappyPath": 8092,
+        "reportMaxBodySizeHappyPath": 8092,
+        "reportMaxHttpResponseSizeTest": 8092,
+        "reportMaxBodySizeTest": 8092,
+        "reportIssuesOnly": false,
+        "reportMaxIssues": 1000,
+        "reportMaxSize": 20971520,
+        "reportGenerateCurlCommand": true
+    },
+    "customizations": {
+        "happyPaths": {
+            "retry": 1,
+            "responsePolicy": {
+                "httpStatusExpected": true,
+                "mustBeConformant": true
+            },
+            "httpStatusExpected": []
+        },
+        "tests": {
+            "responsePolicy": {
+                "httpStatusExpected": true,
+                "mustBeConformant": true
+            }
+        }
+    },
+    "authenticationDetails": [
+        {
+            "BearerAuth": {
+                "type": "bearer",
+                "default": "BearerAuth",
+                "credentials": {
+                    "BearerAuth": {
+                        "description": "BearerAuth security",
+                        "credential": "{{BearerAuth}}"
+                    }
+                }
+            }
+        }
+    ],
+    "operations": {
+        "addPantryItems": {
+            "operationId": "addPantryItems",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/addPantryItems/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "addPantryItems",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/pantry/add",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "items": [
+                                    {
+                                        "category": "kkckfcspicnlohrdqtcmukmixjzxcjap",
+                                        "customImage": "uomhzcnbprvqjzwajwfmvnkhikgwfvjz",
+                                        "expiryDate": "bcbtveihfxiroqbcebgukfepbqfovtlf",
+                                        "isCustom": false,
+                                        "name": "afuihyltggtteeiiajqkzxeghnrufjur",
+                                        "purchaseDate": "wtezqhfmtyjznaeukicagrstbrczaaud",
+                                        "quantity": 2.4278269124141542e+38,
+                                        "unit": "dhlnwpqtxwapqijpioeywcobhbuxmbnw"
+                                    }
+                                ],
+                                "userId": "xcryspakwvwtcqrrstufawhghcqzrhaz"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    }
+                }
+            }
+        },
+        "createShoppingList": {
+            "operationId": "createShoppingList",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/createShoppingList/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "createShoppingList",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/shopping-list/create",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "items": [
+                                    {
+                                        "category": "zjszjvdwiyngshjzpxieafqtyxwgocib",
+                                        "name": "srkmbuingvpzapwueranputftsselecj",
+                                        "quantity": 2.974305040229932e+37,
+                                        "unit": "tmojbrevfumfdannvmrafffyqykbibpa"
+                                    },
+                                    {
+                                        "category": "wpmnogwbxvbrwmtkvkxzkrweyxpaawjb",
+                                        "name": "gyynfdfiqurkipwlpbjnnfdjyihipgff",
+                                        "quantity": 2.2556002909190145e+38,
+                                        "unit": "qouxzcfkwdfzspghdiqjfpumvkoqgihc"
+                                    },
+                                    {
+                                        "category": "xghttsqxvokuikomhcklknlpxcddsjwp",
+                                        "name": "viookmzwogxquwqemgkokdfelwpytpkp",
+                                        "quantity": 1.3586859315740308e+38,
+                                        "unit": "lgotbtlhfqpndrftuoqojvbiepiqtydn"
+                                    },
+                                    {
+                                        "category": "hszlmgsjbdypolbronbxpgdhxkfzexgx",
+                                        "name": "ngwkdcckulzndgxuwenmhmvejtqpbfho",
+                                        "quantity": 1.2460046232095366e+35,
+                                        "unit": "kmkxyssnzwtseliprofjsdglfibgiumn"
+                                    }
+                                ],
+                                "name": "npvdfqzntvftsuzjeemkhqetngkqkfmt",
+                                "userId": "lhaoyqojssfxyabhfcmgkqoxviftismg"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    }
+                }
+            }
+        },
+        "createUserProfile": {
+            "operationId": "createUserProfile",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/createUserProfile/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "createUserProfile",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/user/profile",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "displayName": "cbgkzrjqnuookceqxlpgruxqymeeuofz",
+                                "email": "erlcznxegriilpvtrbrkmwkglmvfjsau",
+                                "preferences": {
+                                    "dietaryRestrictions": [
+                                        "clxgyfxwqtbeiybusniqcuqqgiwpezly"
+                                    ]
+                                },
+                                "updatedAt": {
+                                    "_nanoseconds": 2568134766789728394,
+                                    "_seconds": 6122084610414909989
+                                },
+                                "userId": "vygltcqrlbzrxodobqkbuzwgiyzadboe"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "400": {
+                        "expectations": {
+                            "httpStatus": 400
+                        }
+                    }
+                }
+            }
+        },
+        "getPantryItems": {
+            "operationId": "getPantryItems",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/getPantryItems/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "getPantryItems",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/pantry/{userId}",
+                        "method": "GET",
+                        "paths": [
+                            {
+                                "key": "userId",
+                                "value": "iqgsxwjenmqedlomdrsxvclntjyjhwyt"
+                            }
+                        ]
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    }
+                }
+            }
+        },
+        "getShoppingLists": {
+            "operationId": "getShoppingLists",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/getShoppingLists/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "getShoppingLists",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/shopping-lists/{userId}",
+                        "method": "GET",
+                        "paths": [
+                            {
+                                "key": "userId",
+                                "value": "upwfsdwkslvjhpznquminxaiodeopqqx"
+                            }
+                        ]
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    }
+                }
+            }
+        },
+        "getUserProfile": {
+            "operationId": "getUserProfile",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/getUserProfile/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "getUserProfile",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/user/profile/{userId}",
+                        "method": "GET",
+                        "paths": [
+                            {
+                                "key": "userId",
+                                "value": "bpytkhansvfaykrzgcpmzehjmazprlfn"
+                            }
+                        ]
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "404": {
+                        "expectations": {
+                            "httpStatus": 404
+                        }
+                    }
+                }
+            }
+        },
+        "queryAIChef": {
+            "operationId": "queryAIChef",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/queryAIChef/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "queryAIChef",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/ai-chef/query",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "query": "xqnxiajotohplozkqpkhpfuqsgbbanvd",
+                                "userId": "rfmkregbaqfjwonjznrsvvvblnaufsav"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "503": {
+                        "expectations": {
+                            "httpStatus": 503
+                        }
+                    }
+                }
+            }
+        },
+        "recognizeFood": {
+            "operationId": "recognizeFood",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/recognizeFood/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "recognizeFood",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/food/recognize",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "imageUrl": "epoyzmsqntkijicfixufyclrfnmtxisw",
+                                "userId": "lwxrfvpprkywqtjfctmnzjbyqpzcbeyh"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    }
+                }
+            }
+        },
+        "searchFood": {
+            "operationId": "searchFood",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/searchFood/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "searchFood",
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/food/search",
+                        "method": "GET",
+                        "queries": [
+                            {
+                                "key": "query",
+                                "value": "tgrbimgsvaynljvhbffagilydlinlpey"
+                            }
+                        ]
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "environments": {
+        "default": {
+            "variables": {
+                "BearerAuth": {
+                    "from": "environment",
+                    "name": "SCAN42C_SECURITY_BEARERAUTH",
+                    "required": false,
+                    "default": "secret_to_be_overridden"
+                },
+                "host": {
+                    "from": "environment",
+                    "name": "SCAN42C_HOST",
+                    "required": false,
+                    "default": "https://us-central1-pantryapp-fd04e.cloudfunctions.net/api"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,3 @@
+apis:
+  backend/openapi.yaml:
+    alias: micropantry-api

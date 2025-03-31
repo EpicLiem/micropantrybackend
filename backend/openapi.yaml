@@ -1,0 +1,507 @@
+openapi: 3.0.0
+info:
+  title: MicroPantry API
+  description: |
+    API for the MicroPantry application, providing endpoints for managing pantry items, 
+    shopping lists, user profiles, and AI-powered features for food management.
+    
+    ## Authentication
+    This API uses Firebase Authentication. All endpoints require a valid Firebase ID token
+    to be included in the Authorization header as a Bearer token.
+  version: 1.0.0
+  contact:
+    name: MicroPantry Support
+servers:
+  - url: https://us-central1-pantryapp-fd04e.cloudfunctions.net/api
+    description: Production server
+
+components:
+  schemas:
+    UserProfile:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: User's display name
+          minLength: 1
+        preferences:
+          type: object
+          properties:
+            dietaryRestrictions:
+              type: array
+              items:
+                type: string
+              description: List of dietary restrictions
+          description: User preferences object
+      required:
+        - displayName
+
+    UserProfileResponse:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: User's display name
+        email:
+          type: string
+          format: email
+          description: User's email address (from authentication)
+        preferences:
+          type: object
+          properties:
+            dietaryRestrictions:
+              type: array
+              items:
+                type: string
+              description: List of dietary restrictions
+          description: User preferences object
+        updatedAt:
+          type: object
+          properties:
+            _seconds:
+              type: integer
+            _nanoseconds:
+              type: integer
+          description: Last update timestamp (server-controlled)
+        createdAt:
+          type: object
+          properties:
+            _seconds:
+              type: integer
+            _nanoseconds:
+              type: integer
+          description: Creation timestamp (server-controlled)
+
+    ShoppingListItem:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the item
+        quantity:
+          type: number
+          description: Quantity of the item
+        unit:
+          type: string
+          description: Unit of measurement
+        category:
+          type: string
+          description: Category of the item
+
+    ShoppingList:
+      type: object
+      properties:
+        userId:
+          type: string
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShoppingListItem'
+
+    PantryItem:
+      type: object
+      properties:
+        name:
+          type: string
+        quantity:
+          type: number
+        unit:
+          type: string
+        category:
+          type: string
+        expiryDate:
+          type: string
+          format: date-time
+        customImage:
+          type: string
+          nullable: true
+        isCustom:
+          type: boolean
+        purchaseDate:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+
+  securitySchemes:
+    FirebaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Firebase ID token obtained through Firebase Authentication.
+        The token should be included in the Authorization header as: `Bearer <token>`.
+
+security:
+  - FirebaseAuth: []
+
+paths:
+  /user/profile:
+    post:
+      summary: Create or update user profile
+      description: |
+        Creates or updates the profile data for the authenticated user in Firestore.
+        This endpoint requires Firebase Authentication - the user must be registered
+        through Firebase Auth first.
+      security:
+        - FirebaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfile'
+      responses:
+        '200':
+          description: Profile created/updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '400':
+          description: Invalid input data
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '403':
+          description: Forbidden - User ID mismatch
+
+  /user/profile/{userId}:
+    get:
+      summary: Get user profile
+      description: |
+        Retrieves a user profile. The authenticated user can only access their own profile.
+        The userId must match the authenticated user's ID.
+      operationId: getUserProfile
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Attempting to access another user's profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shopping-list/create:
+    post:
+      summary: Create a new shopping list
+      operationId: createShoppingList
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShoppingList'
+      responses:
+        '200':
+          description: Shopping list created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  listId:
+                    type: string
+
+  /shopping-lists/{userId}:
+    get:
+      summary: Get user's shopping lists
+      operationId: getShoppingLists
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shopping lists retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lists:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        userId:
+                          type: string
+                        name:
+                          type: string
+                        createdAt:
+                          type: object
+                        updatedAt:
+                          type: object
+
+  /pantry/add:
+    post:
+      summary: Add items to pantry
+      operationId: addPantryItems
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PantryItem'
+      responses:
+        '200':
+          description: Items added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /pantry/{userId}:
+    get:
+      summary: Get user's pantry items
+      operationId: getPantryItems
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pantry items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PantryItem'
+
+  /food/search:
+    get:
+      summary: Search food database
+      operationId: searchFood
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Food search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        category:
+                          type: string
+                        nutritionInfo:
+                          type: object
+
+  /ai-chef/query:
+    post:
+      summary: Get AI-powered recipe suggestions
+      operationId: queryAIChef
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                query:
+                  type: string
+      responses:
+        '200':
+          description: AI Chef response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        recipe:
+                          type: string
+                        ingredients:
+                          type: array
+                          items:
+                            type: string
+                        instructions:
+                          type: array
+                          items:
+                            type: string
+        '503':
+          description: AI service not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /food/recognize:
+    post:
+      summary: Recognize food items in an image
+      description: Uses OpenAI's vision model to identify food items in the provided image
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageUrl:
+                  type: string
+                  description: URL of the image to analyze
+                  format: uri
+              required:
+                - imageUrl
+      responses:
+        '200':
+          description: Food items recognized successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      recognizedItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            category:
+                              type: string
+                            confidence:
+                              type: number
+                              minimum: 0
+                              maximum: 1
+        '400':
+          description: Bad request - missing image URL
+        '401':
+          description: Unauthorized - invalid or missing token
+        '500':
+          description: Server error
+
+  /receipt/scan:
+    post:
+      summary: Scan and extract items from a receipt image
+      description: Uses OpenAI's vision model to extract items and prices from a receipt image
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageUrl:
+                  type: string
+                  description: URL of the receipt image to analyze
+                  format: uri
+              required:
+                - imageUrl
+      responses:
+        '200':
+          description: Receipt scanned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            price:
+                              type: number
+                            quantity:
+                              type: integer
+                            total:
+                              type: number
+        '400':
+          description: Bad request - missing image URL
+        '401':
+          description: Unauthorized - invalid or missing token
+        '500':
+          description: Server error 

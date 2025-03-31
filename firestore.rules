@@ -1,58 +1,10 @@
 rules_version = '2';
+
+// Old security rules were crazy
 service cloud.firestore {
-  match /databases/{database}/documents {
-    // User profiles
-    match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Pantries
-    match /pantries/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null && request.auth.uid == userId;
-      
-      match /items/{itemId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow write: if request.auth != null && request.auth.uid == userId;
-      }
-    }
-    
-    // Shopping lists
-    match /shopping-lists/{listId} {
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
-      
-      match /items/{itemId} {
-        allow read: if request.auth != null && get(/databases/$(database)/documents/shopping-lists/$(listId)).data.userId == request.auth.uid;
-        allow write: if request.auth != null && get(/databases/$(database)/documents/shopping-lists/$(listId)).data.userId == request.auth.uid;
-      }
-    }
-    
-    // Recipes
-    match /recipes/{recipeId} {
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
-    }
-    
-    // Meal plans
-    match /meal-plans/{planId} {
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
-      
-      match /meals/{mealId} {
-        allow read: if request.auth != null && get(/databases/$(database)/documents/meal-plans/$(planId)).data.userId == request.auth.uid;
-        allow write: if request.auth != null && get(/databases/$(database)/documents/meal-plans/$(planId)).data.userId == request.auth.uid;
-      }
-    }
-    
-    // Notifications
-    match /notifications/{notificationId} {
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
-    }
+  match /users/{userId}/pantry/{documentId} {
+    allow read: if request.auth.uid == userId; // Only the owner can read
+    allow write: if request.auth.uid == userId; // Only the owner can write
+    allow delete: if request.auth.uid == userId; // Only the owner can delete
   }
-} 
+}
