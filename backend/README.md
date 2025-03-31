@@ -15,6 +15,15 @@ Firebase Functions backend for the MicroPantry grocery management application.
 - Food item recognition
 - Micronutrition analysis
 
+## API Documentation
+
+You can view the complete API documentation in an interactive format using Swagger UI:
+[View API Documentation](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/EpicLiem/micropantrybackend/refs/heads/main/backend/openapi.yaml#/)
+
+## Authentication
+
+This API uses Firebase Authentication. All endpoints require a valid Firebase ID token to be included in the Authorization header as a Bearer token.
+
 ## API Endpoints
 
 ### User Management
