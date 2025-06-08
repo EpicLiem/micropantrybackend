@@ -87,6 +87,10 @@ components:
         category:
           type: string
           description: Category of the item
+        isChecked:
+          type: boolean
+          description: Whether the item is checked
+          default: false
 
     ShoppingList:
       type: object
@@ -131,6 +135,86 @@ components:
           format: date-time
           description: Date when the item was purchased
 
+    Recipe:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the recipe
+        description:
+          type: string
+          description: Description of the recipe
+        ingredients:
+          type: array
+          items:
+            type: string
+          description: List of ingredients
+        instructions:
+          type: array
+          items:
+            type: string
+          description: List of instructions
+        prepTime:
+          type: number
+          description: Preparation time in minutes
+        cookTime:
+          type: number
+          description: Cooking time in minutes
+        servings:
+          type: number
+          description: Number of servings
+        nutrition:
+          type: object
+          description: Nutrition information
+        image:
+          type: string
+          nullable: true
+          description: URL of recipe image
+        tags:
+          type: array
+          items:
+            type: string
+          description: Recipe tags
+        isFavorite:
+          type: boolean
+          description: Whether this is a favorite recipe
+          default: false
+
+    MealPlan:
+      type: object
+      properties:
+        userId:
+          type: string
+        name:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+          nullable: true
+        meals:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date-time
+              type:
+                type: string
+                enum: [breakfast, lunch, dinner, snack]
+              recipeId:
+                type: string
+                nullable: true
+              recipeName:
+                type: string
+                nullable: true
+              notes:
+                type: string
+                nullable: true
+
     Error:
       type: object
       properties:
@@ -155,6 +239,7 @@ paths:
     get:
       summary: Health check endpoint
       description: Simple health check endpoint that doesn't require authentication
+      security: []
       responses:
         '200':
           description: Service is healthy
@@ -306,6 +391,117 @@ paths:
                         updatedAt:
                           type: object
 
+  /shopping-list/{listId}:
+    get:
+      summary: Get shopping list items
+      operationId: getShoppingListItems
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shopping list items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  list:
+                    type: object
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShoppingListItem'
+        '404':
+          description: Shopping list not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shopping-list/{listId}/add:
+    post:
+      summary: Add items to shopping list
+      operationId: addShoppingListItems
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ShoppingListItem'
+      responses:
+        '200':
+          description: Items added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '404':
+          description: Shopping list not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /shopping-list/{listId}/item/{itemId}:
+    put:
+      summary: Update shopping list item
+      operationId: updateShoppingListItem
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShoppingListItem'
+      responses:
+        '200':
+          description: Item updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /pantry/add:
     post:
       summary: Add items to pantry
@@ -389,6 +585,141 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /pantry/item/{userId}/{itemId}:
+    put:
+      summary: Update pantry item
+      operationId: updatePantryItem
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PantryItem'
+      responses:
+        '200':
+          description: Item updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete pantry item
+      operationId: deletePantryItem
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Item deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '404':
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /meal-plan/create:
+    post:
+      summary: Create a meal plan
+      operationId: createMealPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealPlan'
+      responses:
+        '200':
+          description: Meal plan created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  mealPlanId:
+                    type: string
+
+  /meal-plans/{userId}:
+    get:
+      summary: Get user's meal plans
+      operationId: getMealPlans
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meal plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plans:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        startDate:
+                          type: string
+                          format: date-time
+                        endDate:
+                          type: string
+                          format: date-time
+                        createdAt:
+                          type: object
+                        updatedAt:
+                          type: object
+
   /meal-plan/{planId}:
     get:
       summary: Get meal plan details
@@ -458,6 +789,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /recipe/save:
+    post:
+      summary: Save a recipe
+      operationId: saveRecipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                recipe:
+                  $ref: '#/components/schemas/Recipe'
+      responses:
+        '200':
+          description: Recipe saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  recipeId:
+                    type: string
 
   /recipes/{userId}:
     get:
@@ -580,6 +941,152 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /ai-chef/query:
+    post:
+      summary: Process natural language request for AI Chef
+      operationId: queryAiChef
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                query:
+                  type: string
+              required:
+                - userId
+                - query
+      responses:
+        '200':
+          description: Query processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+
+  /ai-chef/customize:
+    post:
+      summary: Process natural language request for AI Chef with nutritional customization
+      operationId: customizeAiChef
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                query:
+                  type: string
+                nutritionalPreferences:
+                  type: object
+                  properties:
+                    protein:
+                      type: number
+                      description: Target protein in grams
+                    carbs:
+                      type: number
+                      description: Target carbohydrates in grams
+                    fat:
+                      type: number
+                      description: Target fat in grams
+                    calories:
+                      type: number
+                      description: Target calories
+                    dietaryRestrictions:
+                      type: array
+                      items:
+                        type: string
+                      description: List of dietary restrictions
+              required:
+                - userId
+                - query
+      responses:
+        '200':
+          description: Customized query processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+
+  /recipes/search:
+    post:
+      summary: Search for recipes based on natural language query
+      operationId: searchRecipes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+              required:
+                - query
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+
   /food/search:
     get:
       summary: Search food database
@@ -627,6 +1134,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /food/recognize:
+    post:
+      summary: Recognize food items in an image
+      operationId: recognizeFood
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageUrl:
+                  type: string
+                  format: uri
+              required:
+                - imageUrl
+      responses:
+        '200':
+          description: Food recognition results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      recognizedItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            category:
+                              type: string
+                            confidence:
+                              type: number
 
   /food/nutrition/{foodId}:
     get:
@@ -732,6 +1282,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /receipt/scan:
+    post:
+      summary: Scan receipt using AI vision
+      operationId: scanReceipt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageUrl:
+                  type: string
+                  format: uri
+              required:
+                - imageUrl
+      responses:
+        '200':
+          description: Receipt scanned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            price:
+                              type: number
+                            quantity:
+                              type: integer
+                            total:
+                              type: number
 
   /barcode/process:
     post:

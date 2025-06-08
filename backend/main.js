@@ -742,7 +742,7 @@ app.post("/ai-chef/query", authorizeUser, async (req, res) => {
         },
         {role: "user", content: query},
       ],
-      model: "gpt-3.5-turbo",
+      model: "gpt-4.1-nano-2025-04-14",
     });
 
     return res.status(200).json({
@@ -751,6 +751,79 @@ app.post("/ai-chef/query", authorizeUser, async (req, res) => {
   } catch (error) {
     console.error("Error processing AI Chef query:", error);
     return res.status(500).json({error: "Failed to process query"});
+  }
+});
+
+// New endpoint for AI Chef with nutritional customization
+app.post("/ai-chef/customize", authorizeUser, async (req, res) => {
+  try {
+    const {userId, query, nutritionalPreferences} = req.body;
+
+    if (!userId || !query) {
+      return res.status(400).json({error: "User ID and query are required"});
+    }
+
+    // Check if OpenAI is available
+    if (!openai) {
+      return res.status(503).json({
+        error: "AI Chef service unavailable",
+        message: "OpenAI integration is not configured",
+      });
+    }
+
+    // Get user's pantry items
+    const pantryRef = db.collection("pantries").doc(userId);
+    const itemsSnapshot = await pantryRef.collection("items").get();
+    const pantryItems = [];
+
+    itemsSnapshot.forEach((doc) => {
+      pantryItems.push(doc.data().name);
+    });
+
+    // Construct nutritional preferences string
+    let nutritionalContext = "";
+    if (nutritionalPreferences) {
+      nutritionalContext = "Consider these nutritional preferences: ";
+      if (nutritionalPreferences.protein) {
+        nutritionalContext += `Target protein: ${nutritionalPreferences.protein}g. `;
+      }
+      if (nutritionalPreferences.carbs) {
+        nutritionalContext += `Target carbs: ${nutritionalPreferences.carbs}g. `;
+      }
+      if (nutritionalPreferences.fat) {
+        nutritionalContext += `Target fat: ${nutritionalPreferences.fat}g. `;
+      }
+      if (nutritionalPreferences.calories) {
+        nutritionalContext += `Target calories: ${nutritionalPreferences.calories}. `;
+      }
+      if (nutritionalPreferences.dietaryRestrictions) {
+        nutritionalContext += `Dietary restrictions: ${nutritionalPreferences.dietaryRestrictions.join(", ")}. `;
+      }
+    }
+
+    // Using OpenAI to process the query with nutritional preferences
+    const completion = await openai.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: `You are an AI Chef assistant specializing in nutritionally balanced meals. 
+                   The user has these ingredients in their pantry: ${pantryItems.join(", ")}. 
+                   ${nutritionalContext}
+                   Recommend recipes based on their query, pantry ingredients, and nutritional preferences. 
+                   Include detailed nutritional information for each recipe. 
+                   If you need more ingredients, suggest what they need to buy.`,
+        },
+        {role: "user", content: query},
+      ],
+      model: "gpt-4.1-nano-2025-04-14",
+    });
+
+    return res.status(200).json({
+      response: completion.choices[0].message.content,
+    });
+  } catch (error) {
+    console.error("Error processing AI Chef customization query:", error);
+    return res.status(500).json({error: "Failed to process customization query"});
   }
 });
 
@@ -795,7 +868,7 @@ app.post("/recipes/search", authorizeUser, async (req, res) => {
         },
         {role: "user", content: query},
       ],
-      model: "gpt-3.5-turbo",
+      model: "gpt-4.1-nano-2025-04-14",
       response_format: {type: "json_object"},
     });
 
@@ -966,7 +1039,7 @@ app.post("/micronutrition/analyze", authorizeUser, async (req, res) => {
         },
         {role: "user", content: `Analyze micronutrients for: ${foodName}`},
       ],
-      model: "gpt-3.5-turbo",
+      model: "gpt-4.1-nano-2025-04-14",
     });
 
     return res.status(200).json({

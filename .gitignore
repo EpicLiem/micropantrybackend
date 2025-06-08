@@ -31,4 +31,5 @@ build/
 
 # Service account keys
 *-service-account.json
-serviceAccountKey.json 
+serviceAccountKey.json
+service-account.json
